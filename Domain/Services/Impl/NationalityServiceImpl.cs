@@ -1,0 +1,88 @@
+﻿using BookStoreSys_API.Domain.BO;
+using BookStoreSys_API.Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
+
+namespace BookStoreSys_API.Domain.Services.Impl
+{
+    public class NationalityServiceImpl : INationalityService
+    {
+        private readonly BookstoreContext _context;
+        private readonly ILogger<NationalityServiceImpl> _logger;
+
+        public NationalityServiceImpl(
+            BookstoreContext context,
+            ILogger<NationalityServiceImpl> logger)
+        {
+            _context = context ?? throw new ArgumentException(nameof(context));
+            _logger = logger ?? throw new ArgumentException(nameof(logger));
+        }
+
+        public async Task<List<NationalityModel>> GetAll()
+        {
+            try
+            {
+                return await _context.Nationalities.AsNoTracking().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving all nationalities.");
+                throw new Exception("An error occurred while retrieving all nationalities.", ex);
+            }
+        }
+
+        public async Task<NationalityModel> GetById(int id)
+        {
+            try
+            {
+                var nationality = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == id);
+                return nationality;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error occurred while retrieving nationality with ID {id}.");
+                throw new Exception($"An error occurred while retrieving nationality with ID {id}.", ex);
+            }
+        }
+
+        public async Task<NationalityModel> Save(NationalityModel model)
+        {
+            try
+            {
+                _context.Nationalities.Add(model);
+                await _context.SaveChangesAsync();
+                return model;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while saving a nationality.");
+                throw new Exception("An error occurred while saving the nationality.", ex);
+            }
+        }
+
+        public async Task<NationalityModel> Update(NationalityModel model)
+        {
+            try
+            {
+                var nationalityTemp = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == model.Id);
+
+                if (nationalityTemp == null)
+                {
+                    throw new KeyNotFoundException($"Nationality with ID {model.Id} was not found.");
+                }
+
+                _context.Entry(nationalityTemp).CurrentValues.SetValues(model);
+                await _context.SaveChangesAsync();
+                return model;
+            }
+            catch (KeyNotFoundException ex)
+            {
+                throw new KeyNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating nationality with ID {Id}", model.Id);
+                throw new Exception($"An error occurred while updating nationality with ID {model.Id}.", ex);
+            }
+        }
+    }
+}
