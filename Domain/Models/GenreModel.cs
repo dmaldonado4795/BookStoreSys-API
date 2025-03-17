@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace BookStoreSys_API.Domain.BO
+namespace BookStoreSys_API.Domain.Model
 {
     [Table("Genre")]
     public class GenreModel
@@ -10,6 +11,7 @@ namespace BookStoreSys_API.Domain.BO
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public HashSet<BookModel> Books { get; set; } = new();
     }
 }

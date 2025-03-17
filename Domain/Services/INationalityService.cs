@@ -1,4 +1,4 @@
-﻿using BookStoreSys_API.Domain.BO;
+﻿using BookStoreSys_API.Domain.Model;
 
 namespace BookStoreSys_API.Domain.Services
 {
@@ -6,7 +6,7 @@ namespace BookStoreSys_API.Domain.Services
     {
         Task<List<NationalityModel>> GetAll();
 
-        Task<NationalityModel> GetById(int id);
+        Task<NationalityModel?> GetById(int id);
 
         Task<NationalityModel> Save(NationalityModel model);
 

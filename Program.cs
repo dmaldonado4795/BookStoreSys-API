@@ -1,4 +1,3 @@
-
 using BookStoreSys_API.Domain.Services;
 using BookStoreSys_API.Domain.Services.Impl;
 using BookStoreSys_API.Infrastructure.Context;
@@ -19,6 +18,9 @@ namespace BookStoreSys_API
             });
 
             builder.Services.AddScoped<INationalityService, NationalityServiceImpl>();
+            builder.Services.AddScoped<IAuthorService, AuthorServiceImpl>();
+            builder.Services.AddScoped<IGenreService, GenreServiceImpl>();
+            builder.Services.AddScoped<IBookService, BookServiceImpl>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

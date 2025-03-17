@@ -1,7 +1,6 @@
 ﻿using BookStoreSys_API.Common.Helpers;
 using BookStoreSys_API.Domain.Services;
 using BookStoreSys_API.Web.DTOs;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookStoreSys_API.Web.Controllers
@@ -14,7 +13,7 @@ namespace BookStoreSys_API.Web.Controllers
 
         public NationalityController(INationalityService nationalityService)
         {
-            _nationalityService = nationalityService;
+            _nationalityService = nationalityService ?? throw new ArgumentException(nameof(nationalityService));
         }
 
         [HttpGet, Route("get-nationalities")]
@@ -31,13 +30,13 @@ namespace BookStoreSys_API.Web.Controllers
             }
         }
 
-        [HttpGet, Route("get-nationaly")]
+        [HttpGet, Route("get-nationaly-by-id")]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                var nationalities = await _nationalityService.GetById(id);
-                return Ok(nationalities);
+                var nationality = await _nationalityService.GetById(id);
+                return Ok(nationality);
             }
             catch (Exception ex)
             {
@@ -52,15 +51,15 @@ namespace BookStoreSys_API.Web.Controllers
             {
                 if (string.IsNullOrWhiteSpace(dto.Country))
                 {
-                    return BadRequest("The 'Country' field is required.");
+                    return BadRequest($"The '{nameof(dto.Country)}' field is required.");
                 }
 
                 if (string.IsNullOrWhiteSpace(dto.Nationality))
                 {
-                    return BadRequest("The 'Nationality' field is required.");
+                    return BadRequest($"The '{nameof(dto.Nationality)}' field is required.");
                 }
 
-                var model = await _nationalityService.Save(NationalityHelper.ToNationalityModel(0, dto));
+                var model = await _nationalityService.Save(ObjectMapperHelper.ToNationalityModel(0, dto));
                 return Ok(new { data = model });
             }
             catch (Exception ex)
@@ -74,17 +73,7 @@ namespace BookStoreSys_API.Web.Controllers
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(dto.Country))
-                {
-                    return BadRequest("The 'Country' field is required.");
-                }
-
-                if (string.IsNullOrWhiteSpace(dto.Nationality))
-                {
-                    return BadRequest("The 'Nationality' field is required.");
-                }
-
-                var model = await _nationalityService.Update(NationalityHelper.ToNationalityModel(id, dto));
+                var model = await _nationalityService.Update(ObjectMapperHelper.ToNationalityModel(id, dto));
                 return Ok(new { data = model });
             }
             catch (KeyNotFoundException ex)

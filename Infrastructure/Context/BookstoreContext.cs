@@ -1,4 +1,4 @@
-﻿using BookStoreSys_API.Domain.BO;
+﻿using BookStoreSys_API.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Infrastructure.Context

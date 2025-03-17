@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace BookStoreSys_API.Domain.BO
+namespace BookStoreSys_API.Domain.Model
 {
     [Table("Nationality")]
     public class NationalityModel
@@ -11,6 +12,7 @@ namespace BookStoreSys_API.Domain.BO
         public string Country { get; set; } = string.Empty;
         public string Nationality { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public HashSet<AuthorModel> Authors { get; set; } = new ();
     }
 }

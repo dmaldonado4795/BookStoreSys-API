@@ -1,4 +1,4 @@
-﻿using BookStoreSys_API.Domain.BO;
+﻿using BookStoreSys_API.Domain.Model;
 using BookStoreSys_API.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,12 +30,11 @@ namespace BookStoreSys_API.Domain.Services.Impl
             }
         }
 
-        public async Task<NationalityModel> GetById(int id)
+        public async Task<NationalityModel?> GetById(int id)
         {
             try
             {
-                var nationality = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == id);
-                return nationality;
+                return await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == id);
             }
             catch (Exception ex)
             {
@@ -63,14 +62,14 @@ namespace BookStoreSys_API.Domain.Services.Impl
         {
             try
             {
-                var nationalityTemp = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == model.Id);
+                var nationality = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == model.Id);
 
-                if (nationalityTemp == null)
+                if (nationality == null)
                 {
                     throw new KeyNotFoundException($"Nationality with ID {model.Id} was not found.");
                 }
 
-                _context.Entry(nationalityTemp).CurrentValues.SetValues(model);
+                _context.Entry(nationality).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
                 return model;
             }
