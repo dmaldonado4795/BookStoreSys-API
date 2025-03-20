@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace BookStoreSys_API.Domain.Model
+namespace BookStoreSys_API.Domain.Models
 {
     [Table("Nationality")]
     public class NationalityModel

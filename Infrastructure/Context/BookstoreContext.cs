@@ -1,15 +1,10 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Infrastructure.Context
 {
-    public class BookstoreContext : DbContext
+    public class BookstoreContext(DbContextOptions<BookstoreContext> options) : DbContext(options)
     {
-        public BookstoreContext(DbContextOptions<BookstoreContext> options) : base(options)
-        {
-
-        }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BookModel>()

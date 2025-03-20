@@ -7,14 +7,9 @@ namespace BookStoreSys_API.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookController : ControllerBase
+    public class BookController(IBookService bookService) : ControllerBase
     {
-        private readonly IBookService _bookService;
-
-        public BookController(IBookService bookService)
-        {
-            _bookService = bookService ?? throw new ArgumentException(nameof(bookService));
-        }
+        private readonly IBookService _bookService = bookService ?? throw new ArgumentException(nameof(bookService));
 
         [HttpGet, Route("get-books")]
         public async Task<IActionResult> GetAll()
@@ -73,6 +68,11 @@ namespace BookStoreSys_API.Web.Controllers
                     return BadRequest($"The '{nameof(dto.Description)}' field is required.");
                 }
 
+                if (!DateOnly.TryParse(dto.PublicationDate, out DateOnly result))
+                {
+                    return BadRequest($"The '{nameof(dto.PublicationDate)}' is invalid.");
+                }
+
                 if (dto.AuthorId <= 0)
                 {
                     return BadRequest($"The '{nameof(dto.AuthorId)}' is invalid.");
@@ -97,6 +97,11 @@ namespace BookStoreSys_API.Web.Controllers
         {
             try
             {
+                if (!string.IsNullOrEmpty(dto.PublicationDate) && !DateOnly.TryParse(dto.PublicationDate, out DateOnly result))
+                {
+                    return BadRequest($"The '{nameof(dto.PublicationDate)}' is invalid.");
+                }
+
                 var model = await _bookService.Update(ObjectMapperHelper.ToBookModel(id, dto));
                 return Ok(new { data = model });
             }

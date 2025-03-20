@@ -1,21 +1,15 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using BookStoreSys_API.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Domain.Services.Impl
 {
-    public class BookServiceImpl : IBookService
+    public class BookServiceImpl(
+        BookstoreContext context,
+        ILogger<BookServiceImpl> logger) : IBookService
     {
-        private readonly BookstoreContext _context;
-        private readonly ILogger<BookServiceImpl> _logger;
-
-        public BookServiceImpl(
-            BookstoreContext context,
-            ILogger<BookServiceImpl> logger)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        private readonly BookstoreContext _context = context ?? throw new ArgumentNullException(nameof(context));
+        private readonly ILogger<BookServiceImpl> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task<List<BookModel>> GetAll()
         {
@@ -23,7 +17,7 @@ namespace BookStoreSys_API.Domain.Services.Impl
             {
                 return await _context.Books.AsNoTracking()
                     .Include(options => options.Author)
-                    .ThenInclude(options => options.Nationality)
+                    .ThenInclude(options => options!.Nationality)
                     .Include(options => options.Genre)
                     .ToListAsync();
             }
@@ -40,7 +34,7 @@ namespace BookStoreSys_API.Domain.Services.Impl
             {
                 return await _context.Books.AsNoTracking()
                     .Include(options => options.Author)
-                    .ThenInclude(options => options.Nationality)
+                    .ThenInclude(options => options!.Nationality)
                     .Include(options => options.Genre)
                     .FirstOrDefaultAsync(options => options.Id == id);
             }
@@ -57,7 +51,7 @@ namespace BookStoreSys_API.Domain.Services.Impl
             {
                 return await _context.Books.AsNoTracking()
                     .Include(options => options.Author)
-                    .ThenInclude(options => options.Nationality)
+                    .ThenInclude(options => options!.Nationality)
                     .Include(options => options.Genre)
                     .FirstOrDefaultAsync(options => options.Title == options.Title);
             }
@@ -74,7 +68,14 @@ namespace BookStoreSys_API.Domain.Services.Impl
             {
                 _context.Books.Add(model);
                 await _context.SaveChangesAsync();
-                return model;
+
+                var savedBook = await _context.Books
+                    .Include(options => options.Author)
+                    .ThenInclude(options => options!.Nationality)
+                    .Include(options => options.Genre)
+                    .FirstOrDefaultAsync(options => options.Id == model.Id);
+
+                return savedBook!;
             }
             catch (Exception ex)
             {
@@ -87,15 +88,16 @@ namespace BookStoreSys_API.Domain.Services.Impl
         {
             try
             {
-                var book = await _context.Authors.FirstOrDefaultAsync(options => options.Id == model.Id);
-
-                if (book == null)
-                {
-                    throw new KeyNotFoundException($"Book with ID {model.Id} was not found.");
-                }
+                var book = await _context.Books
+                    .Include(options => options.Author)
+                    .ThenInclude(options => options!.Nationality)
+                    .Include(options => options.Genre)
+                    .FirstOrDefaultAsync(options => options.Id == model.Id)
+                    ?? throw new KeyNotFoundException($"Book with ID {model.Id} was not found.");
 
                 _context.Entry(book).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
+
                 return model;
             }
             catch (KeyNotFoundException ex)

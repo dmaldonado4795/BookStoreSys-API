@@ -1,21 +1,15 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using BookStoreSys_API.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Domain.Services.Impl
 {
-    public class GenreServiceImpl : IGenreService
+    public class GenreServiceImpl(
+        BookstoreContext context,
+        ILogger<GenreServiceImpl> logger) : IGenreService
     {
-        private readonly BookstoreContext _context;
-        private readonly ILogger<GenreServiceImpl> _logger;
-
-        public GenreServiceImpl(
-            BookstoreContext context,
-            ILogger<GenreServiceImpl> logger)
-        {
-            _context = context ?? throw new ArgumentException(nameof(context));
-            _logger = logger ?? throw new ArgumentException(nameof(logger));
-        }
+        private readonly BookstoreContext _context = context ?? throw new ArgumentException(nameof(context));
+        private readonly ILogger<GenreServiceImpl> _logger = logger ?? throw new ArgumentException(nameof(logger));
 
         public async Task<List<GenreModel>> GetAll()
         {
@@ -75,15 +69,12 @@ namespace BookStoreSys_API.Domain.Services.Impl
         {
             try
             {
-                var genre = await _context.Genres.FirstOrDefaultAsync(options => options.Id == model.Id);
-
-                if (genre == null)
-                {
-                    throw new KeyNotFoundException($"Genre with ID {model.Id} was not found.");
-                }
+                var genre = await _context.Genres.FirstOrDefaultAsync(options => options.Id == model.Id)
+                    ?? throw new KeyNotFoundException($"Genre with ID {model.Id} was not found.");
 
                 _context.Entry(genre).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
+                
                 return model;
             }
             catch (KeyNotFoundException ex)

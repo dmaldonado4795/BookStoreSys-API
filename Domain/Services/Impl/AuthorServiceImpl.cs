@@ -1,21 +1,15 @@
-﻿    using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using BookStoreSys_API.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Domain.Services.Impl
 {
-    public class AuthorServiceImpl : IAuthorService
+    public class AuthorServiceImpl(
+        BookstoreContext context,
+        ILogger<AuthorServiceImpl> logger) : IAuthorService
     {
-        private readonly BookstoreContext _context;
-        private readonly ILogger<AuthorServiceImpl> _logger;
-
-        public AuthorServiceImpl(
-            BookstoreContext context,
-            ILogger<AuthorServiceImpl> logger)
-        {
-            _context = context ?? throw new ArgumentException(nameof(context));
-            _logger = logger ?? throw new ArgumentException(nameof(logger));
-        }
+        private readonly BookstoreContext _context = context ?? throw new ArgumentException(nameof(context));
+        private readonly ILogger<AuthorServiceImpl> _logger = logger ?? throw new ArgumentException(nameof(logger));
 
         public async Task<List<AuthorModel>> GetAll()
         {
@@ -68,7 +62,13 @@ namespace BookStoreSys_API.Domain.Services.Impl
             {
                 _context.Authors.Add(model);
                 await _context.SaveChangesAsync();
-                return model;
+
+                var savedAuthor = await _context.Authors
+                    .AsNoTracking()
+                    .Include(options => options.Nationality)
+                    .FirstOrDefaultAsync(options => options.Id == model.Id);
+
+                return savedAuthor!;
             }
             catch (Exception ex)
             {
@@ -81,16 +81,19 @@ namespace BookStoreSys_API.Domain.Services.Impl
         {
             try
             {
-                var author = await _context.Authors.FirstOrDefaultAsync(options => options.Id == model.Id);
-
-                if (author == null)
-                {
-                    throw new KeyNotFoundException($"Author with ID {model.Id} was not found.");
-                }
+                var author = await _context.Authors
+                    .FirstOrDefaultAsync(options => options.Id == model.Id)
+                    ?? throw new KeyNotFoundException($"Author with ID {model.Id} was not found.");
 
                 _context.Entry(author).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
-                return model;
+
+                var savedAuthor = await _context.Authors
+                  .AsNoTracking()
+                  .Include(options => options.Nationality)
+                  .FirstOrDefaultAsync(options => options.Id == model.Id);
+
+                return savedAuthor!;
             }
             catch (KeyNotFoundException ex)
             {

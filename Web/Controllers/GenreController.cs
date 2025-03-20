@@ -7,14 +7,9 @@ namespace BookStoreSys_API.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GenreController : ControllerBase
+    public class GenreController(IGenreService genreService) : ControllerBase
     {
-        private readonly IGenreService _genreService;
-
-        public GenreController(IGenreService genreService)
-        {
-            _genreService = genreService ?? throw new Exception(nameof(genreService));
-        }
+        private readonly IGenreService _genreService = genreService ?? throw new Exception(nameof(genreService));
 
         [HttpGet, Route("get-genres")]
         public async Task<IActionResult> GetAll()

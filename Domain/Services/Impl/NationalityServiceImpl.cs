@@ -1,21 +1,15 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using BookStoreSys_API.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreSys_API.Domain.Services.Impl
 {
-    public class NationalityServiceImpl : INationalityService
+    public class NationalityServiceImpl(
+        BookstoreContext context,
+        ILogger<NationalityServiceImpl> logger) : INationalityService
     {
-        private readonly BookstoreContext _context;
-        private readonly ILogger<NationalityServiceImpl> _logger;
-
-        public NationalityServiceImpl(
-            BookstoreContext context,
-            ILogger<NationalityServiceImpl> logger)
-        {
-            _context = context ?? throw new ArgumentException(nameof(context));
-            _logger = logger ?? throw new ArgumentException(nameof(logger));
-        }
+        private readonly BookstoreContext _context = context ?? throw new ArgumentException(nameof(context));
+        private readonly ILogger<NationalityServiceImpl> _logger = logger ?? throw new ArgumentException(nameof(logger));
 
         public async Task<List<NationalityModel>> GetAll()
         {
@@ -62,15 +56,12 @@ namespace BookStoreSys_API.Domain.Services.Impl
         {
             try
             {
-                var nationality = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == model.Id);
-
-                if (nationality == null)
-                {
-                    throw new KeyNotFoundException($"Nationality with ID {model.Id} was not found.");
-                }
+                var nationality = await _context.Nationalities.FirstOrDefaultAsync(options => options.Id == model.Id)
+                    ?? throw new KeyNotFoundException($"Nationality with ID {model.Id} was not found.");
 
                 _context.Entry(nationality).CurrentValues.SetValues(model);
                 await _context.SaveChangesAsync();
+                
                 return model;
             }
             catch (KeyNotFoundException ex)

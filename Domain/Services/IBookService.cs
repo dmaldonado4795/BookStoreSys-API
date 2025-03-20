@@ -1,4 +1,4 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 
 namespace BookStoreSys_API.Domain.Services
 {

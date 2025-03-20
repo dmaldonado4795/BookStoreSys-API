@@ -7,14 +7,9 @@ namespace BookStoreSys_API.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthorController : ControllerBase
+    public class AuthorController(IAuthorService authorService) : ControllerBase
     {
-        private readonly IAuthorService _authorService;
-
-        public AuthorController(IAuthorService authorService)
-        {
-            _authorService = authorService ?? throw new ArgumentException(nameof(authorService));
-        }
+        private readonly IAuthorService _authorService = authorService ?? throw new ArgumentException(nameof(authorService));
 
         [HttpGet, Route("get-authors")]
         public async Task<IActionResult> GetAll()
@@ -29,7 +24,7 @@ namespace BookStoreSys_API.Web.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-        
+
         [HttpGet, Route("get-author-by-id")]
         public async Task<IActionResult> GetByName(int id)
         {
@@ -93,7 +88,7 @@ namespace BookStoreSys_API.Web.Controllers
         {
             try
             {
-                if (!DateTime.TryParse(dto.DayOfBirth, out DateTime dayOfBirth))
+                if (!string.IsNullOrEmpty(dto.DayOfBirth) && !DateOnly.TryParse(dto.DayOfBirth, out DateOnly dayOfBirth))
                 {
                     return BadRequest($"The '{dto.DayOfBirth}' is invalid.");
                 }

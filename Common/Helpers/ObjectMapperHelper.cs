@@ -1,4 +1,4 @@
-﻿using BookStoreSys_API.Domain.Model;
+﻿using BookStoreSys_API.Domain.Models;
 using BookStoreSys_API.Web.DTOs;
 
 namespace BookStoreSys_API.Common.Helpers
@@ -23,7 +23,7 @@ namespace BookStoreSys_API.Common.Helpers
                 Name = dto.Name,
                 LastName = dto.LastName,
                 NationalityId = dto.NationalityId,
-                DayOfBirth = DateTime.Parse(dto.DayOfBirth)
+                DayOfBirth = DateOnly.Parse(dto.DayOfBirth)
             };
         }
 

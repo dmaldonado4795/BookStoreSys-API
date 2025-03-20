@@ -7,14 +7,9 @@ namespace BookStoreSys_API.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class NationalityController : ControllerBase
+    public class NationalityController(INationalityService nationalityService) : ControllerBase
     {
-        private readonly INationalityService _nationalityService;
-
-        public NationalityController(INationalityService nationalityService)
-        {
-            _nationalityService = nationalityService ?? throw new ArgumentException(nameof(nationalityService));
-        }
+        private readonly INationalityService _nationalityService = nationalityService ?? throw new ArgumentException(nameof(nationalityService));
 
         [HttpGet, Route("get-nationalities")]
         public async Task<IActionResult> GetAll()

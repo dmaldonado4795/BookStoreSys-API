@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace BookStoreSys_API.Domain.Model
+namespace BookStoreSys_API.Domain.Models
 {
     [Table("Author")]
     public class AuthorModel
@@ -11,7 +11,7 @@ namespace BookStoreSys_API.Domain.Model
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public DateTime DayOfBirth { get; set; }
+        public DateOnly DayOfBirth { get; set; }
         [JsonIgnore]
         public int NationalityId { get; set; }
 
